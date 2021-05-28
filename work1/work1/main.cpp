@@ -10,14 +10,7 @@
 #include "RespondFactory.h"
 using namespace std;
 
-// 编码
-string encodeMsg(Codec* codec) {
-	return codec->encodeMsg();
-}
-// 解码
-void* decodeMsg(Codec* codec) {
-	return codec->decodeMsg();
-}
+
 
 int main()
 {
@@ -29,21 +22,27 @@ int main()
 
 	//Request req(&reqInfo);
 	// 使用工厂创建Request
-	RequestFactory* reqFactory = new RequestFactory(&reqInfo);
-	Request* req = (Request*)reqFactory->createCodec();
+	CodecFactory* factory = new RequestFactory(&reqInfo);
+	Codec* codec = factory->createCodec();
 	// 编码
-	string reqmsg = encodeMsg(req);
+	string str = codec->encodeMsg();
+	cout << "编码: " << str << endl;
+	delete factory;
+	delete codec;
 	// 解码
-	reqFactory = new RequestFactory(reqmsg);
-	Request* req1 = (Request*)reqFactory->createCodec();
-	RequestMsg* reqMsg = (RequestMsg*)decodeMsg(req1);
+	factory = new RequestFactory(str);
+	codec = factory->createCodec();
+	RequestMsg* reqMsg = (RequestMsg*)codec->decodeMsg();
 	cout << "cmdtype: " << reqMsg->cmdtype()
 		<< ", clientID: " << reqMsg->clientid()
 		<< ", serverID: " << reqMsg->serverid()
 		<< ", data: " << reqMsg->data()
 		<< ", sign: " << reqMsg->sign()
 		<< endl;
-	
+	delete factory;
+	delete codec;
+
+	cout << "===========================" << endl;
 	ResponseInfo repInfo;
 	repInfo.clientID = "我是小明";
 	repInfo.serverID = "我是小明的秘书";
@@ -51,17 +50,22 @@ int main()
 	repInfo.status = 1;
 	repInfo.seckeyID = 9527;
 
-	RespondFactory* repFactory = new RespondFactory(&repInfo);
-	Response* rep =(Response*) repFactory->createCodec();
-	string repmsg = encodeMsg(rep);
+	factory = new RespondFactory(&repInfo);
+	codec= factory->createCodec();
+	str = codec->encodeMsg();
+	cout << "编码:" << str << endl;
+	delete factory;
+	delete codec;
 	// 解码
-	repFactory = new RespondFactory(repmsg);
-	Response* resp1 =(Response*)repFactory->createCodec();
-	RespondMsg* repMsg = (RespondMsg*)decodeMsg(resp1);
+	factory = new RespondFactory(str);
+	codec =factory->createCodec();
+	RespondMsg* repMsg = (RespondMsg*)codec->decodeMsg();
 	cout << "cientid: " << repMsg->clientid()
 		<< ", serverid: " << repMsg->serverid()
 		<< ", seckeyid: " << repMsg->seckeyid()
 		<< ", rv: " << repMsg->rv()
 		<< endl;
+	delete factory;
+	delete codec;
 	return 0;
 }

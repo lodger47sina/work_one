@@ -2,11 +2,13 @@
 
 RespondFactory::RespondFactory(string enc)
 {
+	m_flag = false;
 	this->m_encStr = enc;
 }
 
 RespondFactory::RespondFactory(ResponseInfo * info)
 {
+	m_flag = true;
 	this->m_info = info;
 }
 
@@ -16,16 +18,14 @@ RespondFactory::~RespondFactory()
 
 Codec * RespondFactory::createCodec()
 {
-	if (!this->m_encStr.empty())
+	Codec* codec = NULL;
+	if (!m_flag)
 	{
-		return new Response(this->m_encStr);
+		codec = new Response(this->m_encStr);
 	}
-	else if (NULL != this->m_info)
+	else
 	{
-		return new Response(this->m_info);
+		codec = new Response(this->m_info);
 	}
-	else {
-		return new Response;
-	}
-	
+		return codec;
 }
